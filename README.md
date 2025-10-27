@@ -166,7 +166,8 @@ START SysGuard
 
 END SysGuard
 
-<img width="519" height="345" alt="image" src="https://github.com/user-attachments/assets/3ec6548d-ab49-4e4a-93ce-2b0d37893c36" />
+<img width="682" height="431" alt="image" src="https://github.com/user-attachments/assets/3c2715ff-586b-4732-b601-65727de3a745" />
+
 
 
 
