@@ -27,9 +27,13 @@ SysGuard offers a **menu-driven interface** to make interaction easy and intuiti
 Technologies Used:
 
 Unix Shell Scripting (bash)
+
 System commands: df, uptime, who, awk, ps, mail
+
 Linux /proc filesystem
+
 ANSI Color Codes for terminal formatting
+
 
 ### 🧩 1. System Health Report
 - Displays detailed system performance information:
@@ -174,10 +178,14 @@ Uptime: 3 hours 25 minutes
 ------------------------------------------
 
 
-## Enhancements
+
+### Enhancements
 
 Add log file for past reports (reports/ folder).
+
 Include network bandwidth statistics.
+
 Schedule automatic report generation using cron.
+
 Export reports as .txt or .html.
 
