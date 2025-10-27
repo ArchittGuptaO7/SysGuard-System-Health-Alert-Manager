@@ -166,16 +166,8 @@ START SysGuard
 
 END SysGuard
 
-==========================================
-        SYSTEM HEALTH REPORT
-Generated: 2025-10-27 08:55:12 IST
-Users Logged In: 2 (architt root)
-==========================================
-CPU Load: 34.5 %
-Memory Used: 2.56 GB / 8.00 GB (32.0%)
-Disk (/) Used: 45%
-Uptime: 3 hours 25 minutes
-------------------------------------------
+<img width="519" height="345" alt="image" src="https://github.com/user-attachments/assets/3ec6548d-ab49-4e4a-93ce-2b0d37893c36" />
+
 
 
 
