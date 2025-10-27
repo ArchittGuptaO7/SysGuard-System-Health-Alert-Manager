@@ -1,1 +1,146 @@
-Menu :
+========== SYS GUARD MENU ========== 
+
+1) Generate System Health Report
+
+2) Show Top 3 CPU/Memory Processes
+
+3) Show Lowest 3 CPU/Memory Processes
+
+4) Send Memory Alert Email (if > 80%)
+
+5) Exit
+
+Enter your choice: 1
+
+==========================================
+
+        SYSTEM HEALTH REPORT
+
+Generated: 2025-10-27 05:05:01 UTC
+
+Users Logged In: 1 (archit_o7 )
+
+==========================================
+
+CPU Load: 0.2%
+
+Memory Used: 0.85 GB / 7.60 GB (11.1%)
+
+Disk Used: 2650780K / 1055762868K (1%)
+
+Uptime: 40 minutes
+
+------------------------------------------
+
+Report saved to ./reports/report_20251027_050501.txt
+
+
+
+========== SYS GUARD MENU ==========
+
+1) Generate System Health Report
+
+2) Show Top 3 CPU/Memory Processes
+
+3) Show Lowest 3 CPU/Memory Processes
+
+4) Send Memory Alert Email (if > 80%)
+
+5) Exit
+
+Enter your choice: 2
+
+Top 3 Processes by CPU:
+
+    PID COMMAND         %CPU %MEM
+
+    302 mysqld           0.9  4.9
+
+    131 snapfuse         0.1  0.1
+
+   1118 bash             0.1  0.0
+
+
+
+Top 3 Processes by Memory:
+
+    PID COMMAND         %CPU %MEM
+
+    302 mysqld           0.9  4.9
+
+    236 snapd            0.1  0.4
+
+    281 unattended-upgr  0.0  0.2
+
+
+
+========== SYS GUARD MENU ==========
+
+1) Generate System Health Report
+
+2) Show Top 3 CPU/Memory Processes
+
+3) Show Lowest 3 CPU/Memory Processes
+
+4) Send Memory Alert Email (if > 80%)
+
+5) Exit
+
+Enter your choice: 3
+
+Lowest 3 Processes by CPU:
+
+    PID COMMAND         %CPU %MEM
+
+      6 init             0.0  0.0
+
+    130 snapfuse         0.0  0.0
+
+    132 snapfuse         0.0  0.0
+
+
+
+Lowest 3 Processes by Memory:
+
+    PID COMMAND         %CPU %MEM
+
+    438 SessionLeader    0.0  0.0
+
+    445 Relay(446)       0.0  0.0
+
+    130 snapfuse         0.0  0.0
+
+
+
+========== SYS GUARD MENU ==========
+
+1) Generate System Health Report
+
+2) Show Top 3 CPU/Memory Processes
+
+3) Show Lowest 3 CPU/Memory Processes
+
+4) Send Memory Alert Email (if > 80%)
+
+5) Exit
+
+Enter your choice: 4
+
+
+
+========== SYS GUARD MENU ==========
+
+1) Generate System Health Report
+
+2) Show Top 3 CPU/Memory Processes
+
+3) Show Lowest 3 CPU/Memory Processes
+
+4) Send Memory Alert Email (if > 80%)
+
+5) Exit
+
+
+Enter your choice: 5
+
+Exiting...
