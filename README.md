@@ -23,160 +23,250 @@ SysGuard offers a **menu-driven interface** to make interaction easy and intuiti
 
 ---
 
-## ⚙️ Key Functionalities
-Technologies Used:
+⚙️ Key Functionalities
+🧠 Technologies Used
 
 Unix Shell Scripting (bash)
 
-System commands: df, uptime, who, awk, ps, mail
+System commands: df, uptime, who, ps, ip, ping, mail
 
-Linux /proc filesystem
+/proc filesystem for CPU and memory statistics
 
 ANSI Color Codes for terminal formatting
 
+Enscript + Ghostscript for PDF report generation
 
-### 🧩 1. System Health Report
-- Displays detailed system performance information:
-  - **CPU Load**
-  - **Memory Used / Total**
-  - **Disk Space Used / Available**
-  - **System Uptime**
-  - **Number of Running Processes**
-  - **Active Logged-in User**
-  - **Report Generated Date & Time**
 
-- Output is **color-coded** for better readability:
-  - 🟢 *Healthy Range*
-  - 🟡 *Moderate Load*
-  - 🔴 *Critical Usage*
+🧩 1. System Health Report
+
+Displays detailed system statistics:
+
+🖥️ CPU Load
+
+💾 Memory Used / Total
+
+📂 Disk Usage
+
+⏱️ System Uptime
+
+👤 Logged-in Users
+
+🧮 Report Timestamp
+
+Generates color-coded outputs:
+
+🟢 Healthy Range
+
+🟡 Moderate Load
+
+🔴 Critical Usage
+
+Automatically saves a .txt report in the /reports folder.
+
+Offers an option to generate the same report as a PDF file.
+
+🌐 2. Network Status Check
+
+Displays all active network interfaces and their IP addresses.
+
+Performs a connectivity test by pinging 8.8.8.8 (Google DNS).
+
+Reports:
+
+✅ Network is UP and Internet reachable
+
+❌ Network DOWN or unreachable
+
+💽 3. Detailed Disk Usage
+
+Lists all mounted partitions and their usage using
+
+Displays device names, sizes, used/free space, and mount points.
+
+Highlights the system’s root partition (/) clearly.
+
+💡 4. Performance Rating
+
+Calculates an average performance score based on:
+
+CPU load
+
+Memory usage
+
+Disk utilization
+
+Outputs performance status:
+
+🟢 Excellent → Avg Load < 40%
+
+🟡 Moderate → 40–70%
+
+🔴 Poor → Avg Load > 70%
+
+✉️ 5. Email Alert Feature
+
+Automatically checks if memory usage exceeds the set threshold (default 80%).
+
+Sends an email alert to the configured address:
+
+Subject: System Alert - High Memory
+
+
+Content includes hostname, timestamp, and memory usage details.
+
+Uses standard Unix mailing utilities (mail or sendmail).
+
+📋 6. Top & Lowest Resource Usage
+
+Top 3 CPU/Memory Processes:
+
+ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 4
+
+Lowest 3 CPU/Memory Processes:
+
+ps -eo pid,comm,%cpu,%mem --sort=%cpu | head -n 4
+
+🧭 7. Menu-Driven Interface
+
+SysGuard provides a user-friendly terminal menu for easy interaction:
+
+========== SYS GUARD MENU ==========
+1) Generate System Health Report
+2) Show Top 3 CPU/Memory Processes
+3) Show Lowest 3 CPU/Memory Processes
+4) Send Memory Alert Email (if > 80%)
+5) Check Network Status
+6) Show Detailed Disk Usage
+7) Performance Rating
+8) Generate PDF System Report
+9) Exit
+
+Each option calls a dedicated function to display, save, or analyze the system data dynamically.
+
+🧾 8. PDF Report Generation
+
+Converts the plain text report into a beautifully formatted PDF automatically using:
+
+enscript -B -p report.ps report.txt
+
+ps2pdf report.ps report.pdf
+
+The generated PDF is stored in ./reports/ with a timestamp.
+
+If the required tools (enscript, ghostscript) are missing, SysGuard displays a setup instruction
+
+## 📖 Code  
+**START SysGuard**
 
 ---
 
-### 📈 2. Top & Bottom Usage Statistics
-- **Top 3 Processes:**  
-  Displays the three processes consuming the highest CPU or memory.
-
-- **Lowest 3 Processes:**  
-  Shows the three least resource-consuming processes currently running.
-
----
-
-### ✉️ 3. Email Alert Feature
-- Sends an automated **email notification** to a configured user if memory usage exceeds a defined threshold (e.g., 80%).  
-- Helps in proactive system management and avoiding overloads.  
-- Uses standard Unix utilities like `mail` or `sendmail`.
+### 1️⃣ INITIALIZATION
+- Enable error handling (exit if command fails).  
+- Define key variables:
+  - `LOG_DIR = "./reports"`
+  - `MEMORY_ALERT_THRESHOLD = 80%`
+  - `ALERT_EMAIL = "your@email.com"`
+- Create `LOG_DIR` if not exists.  
+- Define ANSI color codes (GREEN, YELLOW, RED, BLUE, NC) for colored terminal output.
 
 ---
 
-### 🧭 4. Menu-Driven Interface
-The tool provides an easy-to-navigate menu:
-<img width="539" height="172" alt="image" src="https://github.com/user-attachments/assets/35618d6c-24c0-40e8-9e91-fa552392661f" />
+### 2️⃣ DEFINE `timestamp()`
+- Returns the current system date and time in format:  
+  `YYYY-MM-DD HH:MM:SS`
 
+---
 
-## 📖 Code
-START SysGuard
+### 3️⃣ DEFINE `get_cpu_usage()`
+- Read CPU usage stats from `/proc/stat`.  
+- Wait 1 second and read again.  
+- Compute total CPU time and idle time differences.  
+- Calculate CPU usage percentage:  
+  `CPU% = ((total_diff - idle_diff) / total_diff) * 100`
 
-1. INITIALIZATION
-   - Enable error handling (exit if command fails)
-   - Define variables:
-       LOG_DIR = "./reports"
-       MEMORY_ALERT_THRESHOLD = 80%
-       ALERT_EMAIL = "your@email.com"
-   - Create LOG_DIR if not exists
-   - Define color codes for terminal output
+---
 
-2. DEFINE timestamp()
-   - Return current date and time
+### 4️⃣ DEFINE `get_memory_info()`
+- Read data from `/proc/meminfo`.  
+- Extract `MemTotal` and `MemAvailable`.  
+- Compute:
+  - `Used = Total - Available`  
+  - Convert values to GB.  
+  - `Usage% = (Used / Total) * 100`
+- **Return:** `used_gb | total_gb | percent`
 
-3. DEFINE get_cpu_usage()
-   - Read CPU stats from /proc/stat
-   - Wait 1 second and read again
-   - Compute total CPU and idle differences
-   - Calculate CPU load percentage = ((total - idle_diff) / total_diff) * 100
+---
 
-4. DEFINE get_memory_info()
-   - Read MemTotal and MemAvailable from /proc/meminfo
-   - Calculate used memory = total - available
-   - Convert to GB
-   - Calculate percentage usage = (used / total) * 100
-   - RETURN used_gb | total_gb | percent
+### 5️⃣ DEFINE `get_disk_info()`
+- Use `df -h /` to fetch root partition statistics.  
+- Extract `used`, `total`, and `percent` fields.  
+- **Return:** `used_space | total_space | percent_used`
 
-5. DEFINE get_disk_info()
-   - Use df command to get root (/) partition usage
-   - RETURN used_space | total_space | percent_used
+---
 
-6. DEFINE get_uptime()
-   - Use uptime command or read /proc/uptime
-   - Format as “X days Y hours Z minutes”
+### 6️⃣ DEFINE `get_uptime()`
+- Read uptime seconds from `/proc/uptime`.  
+- Convert to human-readable format:  
+  `"X days Y hours Z minutes"`
 
-7. DEFINE get_user_info()
-   - Use ‘who’ command
-   - Count total logged-in users and their usernames
-   - RETURN user_count | usernames
+---
 
-8. DEFINE top_processes()
-   - Display top 3 processes sorted by CPU usage
-   - Display top 3 processes sorted by Memory usage
+### 7️⃣ DEFINE `get_user_info()`
+- Use `who` command.  
+- Count logged-in users and list their usernames.  
+- **Return:** `user_count | usernames`
 
-9. DEFINE lowest_processes()
-   - Display bottom 3 processes by CPU and Memory
+---
 
-10. DEFINE print_report(cpu, mem_used, mem_total, mem_percent, disk_used, disk_total, disk_percent, uptime, user_count, users)
-    - Print report header (colored)
-    - Display:
-        Generated timestamp
-        Logged-in users
-        CPU load
-        Memory used / total / percent
-        Disk usage
-        System uptime
-    - Print formatted separator
+### 8️⃣ DEFINE `top_processes()`
+- Use `ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 4`  
+  → Display top 3 CPU-consuming processes.  
+- Repeat with `--sort=-%mem` for top 3 memory-consuming processes.
 
-11. DEFINE send_memory_alert(mem_percent)
-    - IF mem_percent > MEMORY_ALERT_THRESHOLD THEN
-         Print alert in red
-         Send email to ALERT_EMAIL with alert message
-      ELSE
-         Do nothing
+---
 
-12. DEFINE main_menu()
-    LOOP FOREVER
-      Display menu options:
-        1. Generate System Health Report
-        2. Show Top 3 CPU/Memory Processes
-        3. Show Lowest 3 CPU/Memory Processes
-        4. Send Memory Alert Email (if > threshold)
-        5. Exit
-      Read user choice
+### 9️⃣ DEFINE `lowest_processes()`
+- Use `ps -eo pid,comm,%cpu,%mem --sort=%cpu | head -n 4`  
+  → Display bottom 3 CPU processes.  
+- Repeat with `--sort=%mem` for memory.
 
-      Gather all metrics using the above functions:
-        cpu, memory_info, disk_info, uptime, user_info
+---
 
-      CASE choice OF
-         1: Call print_report()
-         2: Call top_processes()
-         3: Call lowest_processes()
-         4: Call send_memory_alert()
-         5: EXIT program
-         Default: Print "Invalid Choice"
-    END LOOP
+### 🔟 DEFINE `check_network_status()`
+- Use `ping -c 3 8.8.8.8`.  
+- If packets lost = 100%, show **🔴 Network Down**.  
+- Else, show **🟢 Network Active** with latency info.
 
-13. START PROGRAM
-    - Call main_menu()
+---
 
-END SysGuard
+### 1️⃣1️⃣ DEFINE `show_disk_usage()`
+- Use `df -h` to list all partitions and mount points.  
+- Highlight partitions >80% usage in red.  
+- Show used, total, and available disk space.
 
-<img width="682" height="431" alt="image" src="https://github.com/user-attachments/assets/3c2715ff-586b-4732-b601-65727de3a745" />
+---
+
+### 1️⃣2️⃣ DEFINE `performance_rating()`
+- Fetch CPU, Memory, and Disk usage.  
+- Compute **performance score**:
+
+### 1️⃣3️⃣ DEFINE `print_report(cpu, mem_used, mem_total, mem_percent, disk_used, disk_total, disk_percent, uptime, user_count, users)`
+- Print formatted, color-coded report showing:
+- Timestamp  
+- Active Users  
+- CPU Load  
+- Memory Usage  
+- Disk Usage  
+- Uptime  
+- Save report to `reports/`
+- 
+<img width="848" height="435" alt="image" src="https://github.com/user-attachments/assets/b3bd21d9-0d42-44f8-b53b-af296dd4f7b7" />
 
 
 
 
 
 ### Enhancements
-
-Add log file for past reports (reports/ folder).
-
-Include network bandwidth statistics.
 
 Schedule automatic report generation using cron.
 
