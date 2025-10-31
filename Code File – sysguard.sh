@@ -15,6 +15,8 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+PURPLE='\033[0;35m'
 NC='\033[0m'
 
 timestamp() { date +"%Y-%m-%d %H:%M:%S %Z"; }
@@ -103,6 +105,39 @@ print_report() {
   echo -e "${YELLOW}Report saved to ${report_file}${NC}"
 }
 
+generate_pdf_report() {
+  txt_report="${LOG_DIR}/report_$(date +%Y%m%d_%H%M%S).txt"
+  pdf_report="${txt_report%.txt}.pdf"
+
+  cpu=$(get_cpu_usage)
+  mem_info=$(get_memory_info)
+  IFS='|' read -r mem_used_gb mem_total_gb mem_percent <<< "$mem_info"
+  disk_info=$(get_disk_info)
+  IFS='|' read -r disk_used disk_total disk_percent <<< "$disk_info"
+  uptime=$(get_uptime)
+  user_info=$(get_user_info)
+  IFS='|' read -r user_count users <<< "$user_info"
+
+  {
+    echo "SysGuard - System Health Report"
+    echo "Generated: $(timestamp)"
+    echo "Users Logged In: ${user_count} (${users})"
+    echo "-----------------------------------"
+    echo "CPU Load: ${cpu}%"
+    echo "Memory Used: ${mem_used_gb} GB / ${mem_total_gb} GB (${mem_percent}%)"
+    echo "Disk Used: ${disk_used}K / ${disk_total}K (${disk_percent})"
+    echo "Uptime: ${uptime}"
+  } > "$txt_report"
+
+  if command -v enscript >/dev/null 2>&1 && command -v ps2pdf >/dev/null 2>&1; then
+    enscript "$txt_report" -o - | ps2pdf - "$pdf_report"
+    echo -e "${GREEN}PDF Report Generated: ${pdf_report}${NC}"
+  else
+    echo -e "${RED}enscript or ps2pdf not found. Install with:${NC}"
+    echo "sudo apt install enscript ghostscript -y"
+  fi
+}
+
 send_memory_alert() {
   mem_percent="$1"
   if (( $(echo "$mem_percent > $MEMORY_ALERT_THRESHOLD" | bc -l) )); then
@@ -125,14 +160,62 @@ lowest_processes() {
   ps -eo pid,comm,%cpu,%mem --sort=%mem | head -n 4
 }
 
+check_network_status() {
+  echo -e "${CYAN}Checking network status...${NC}"
+  echo "Active Interfaces:"
+  ip -brief addr show | awk '{print $1, $3}'
+  echo -e "\nPinging Google (8.8.8.8)..."
+  if ping -c 2 -W 2 8.8.8.8 >/dev/null 2>&1; then
+    echo -e "${GREEN}Network is UP and Internet reachable.${NC}"
+  else
+    echo -e "${RED}Network DOWN or Internet unreachable.${NC}"
+  fi
+}
+
+show_disk_usage() {
+  echo -e "${PURPLE}Detailed Disk Usage:${NC}"
+  df -h | awk 'NR==1 || /\/dev\//'
+}
+
+performance_rating() {
+  cpu=$(get_cpu_usage)
+  mem_info=$(get_memory_info)
+  IFS='|' read -r mem_used_gb mem_total_gb mem_percent <<< "$mem_info"
+  disk_info=$(get_disk_info)
+  IFS='|' read -r _ _ disk_percent <<< "$disk_info"
+
+  avg_load=$(awk -v c="$cpu" -v m="$mem_percent" -v d="$(echo "$disk_percent" | tr -d '%')" 'BEGIN { printf "%.1f", (c+m+d)/3 }')
+
+  echo -e "${CYAN}\nSystem Performance Rating:${NC}"
+  if (( $(echo "$avg_load < 40" | bc -l) )); then
+    echo -e "${GREEN}Excellent (Avg Load: ${avg_load}%)${NC}"
+  elif (( $(echo "$avg_load < 70" | bc -l) )); then
+    echo -e "${YELLOW}Moderate (Avg Load: ${avg_load}%)${NC}"
+  else
+    echo -e "${RED}Poor (Avg Load: ${avg_load}%)${NC}"
+  fi
+}
+
 main_menu() {
   while true; do
+    echo -e "${BLUE}\n------------------------------------------------------${NC}"
+    echo -e "${YELLOW}SysGuard - A Unix-based system monitoring project.${NC}"
+    echo -e "${YELLOW}It tracks CPU, memory, and disk usage, generates color-coded reports,${NC}"
+    echo -e "${YELLOW}and alerts via email when memory exceeds limits.${NC}"
+    echo -e "${YELLOW}The tool offers a menu-driven interface to view system stats,${NC}"
+    echo -e "${YELLOW}top/bottom usage, and manage reports efficiently.${NC}"
+    echo -e "${BLUE}------------------------------------------------------${NC}"
+
     echo -e "${GREEN}\n========== SYS GUARD MENU ==========${NC}"
     echo "1) Generate System Health Report"
     echo "2) Show Top 3 CPU/Memory Processes"
     echo "3) Show Lowest 3 CPU/Memory Processes"
     echo "4) Send Memory Alert Email (if > ${MEMORY_ALERT_THRESHOLD}%)"
-    echo "5) Exit"
+    echo "5) Check Network Status"
+    echo "6) Show Detailed Disk Usage"
+    echo "7) Performance Rating"
+    echo "8) Generate System Report (PDF)"
+    echo "9) Exit"
     read -rp "Enter your choice: " choice
 
     cpu=$(get_cpu_usage)
@@ -149,7 +232,11 @@ main_menu() {
       2) top_processes ;;
       3) lowest_processes ;;
       4) send_memory_alert "$mem_percent" ;;
-      5) echo -e "${GREEN}Exiting...${NC}"; exit 0 ;;
+      5) check_network_status ;;
+      6) show_disk_usage ;;
+      7) performance_rating ;;
+      8) generate_pdf_report ;;
+      9) echo -e "${GREEN}Exiting...${NC}"; exit 0 ;;
       *) echo -e "${RED}Invalid choice, try again.${NC}" ;;
     esac
   done
