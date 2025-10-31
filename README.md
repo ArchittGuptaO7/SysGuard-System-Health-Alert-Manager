@@ -259,7 +259,7 @@ If the required tools (enscript, ghostscript) are missing, SysGuard displays a s
 - Disk Usage  
 - Uptime  
 - Save report to `reports/`
-- 
+  
 <img width="848" height="435" alt="image" src="https://github.com/user-attachments/assets/b3bd21d9-0d42-44f8-b53b-af296dd4f7b7" />
 
 
