@@ -1,146 +1,83 @@
-========== SYS GUARD MENU ========== 
-
-1) Generate System Health Report
-
-2) Show Top 3 CPU/Memory Processes
-
-3) Show Lowest 3 CPU/Memory Processes
-
-4) Send Memory Alert Email (if > 80%)
-
-5) Exit
-
-Enter your choice: 1
-
-==========================================
-
-        SYSTEM HEALTH REPORT
-
-Generated: 2025-10-27 05:05:01 UTC
-
-Users Logged In: 1 (archit_o7 )
-
-==========================================
-
-CPU Load: 0.2%
-
-Memory Used: 0.85 GB / 7.60 GB (11.1%)
-
-Disk Used: 2650780K / 1055762868K (1%)
-
-Uptime: 40 minutes
-
-------------------------------------------
-
-Report saved to ./reports/report_20251027_050501.txt
-
-
+------------------------------------------------------
+SysGuard - A Unix-based system monitoring project.
+It tracks CPU, memory, and disk usage, generates color-coded reports,
+and alerts via email when memory exceeds limits.
+The tool offers a menu-driven interface to view system stats,
+top/bottom usage, and manage reports efficiently.
+------------------------------------------------------
 
 ========== SYS GUARD MENU ==========
-
 1) Generate System Health Report
-
 2) Show Top 3 CPU/Memory Processes
-
 3) Show Lowest 3 CPU/Memory Processes
-
 4) Send Memory Alert Email (if > 80%)
-
-5) Exit
+5) Check Network Status
+6) Show Detailed Disk Usage
+7) Performance Rating
+8) Generate System Report (PDF)
+9) Exit
+Enter your choice: 1
+==========================================
+        SYSTEM HEALTH REPORT
+Generated: 2025-10-31 10:43:45 UTC
+Users Logged In: 1 (archit_o7 )
+==========================================
+CPU Load: 0.2%
+Memory Used: 0.86 GB / 7.60 GB (11.3%)
+Disk Used: 2765576K / 1055762868K (1%)
+Uptime: 1 hour, 30 minutes
+------------------------------------------
+Report saved to ./reports/report_20251031_104345.txt
 
 Enter your choice: 2
-
 Top 3 Processes by CPU:
-
     PID COMMAND         %CPU %MEM
-
-    302 mysqld           0.9  4.9
-
-    131 snapfuse         0.1  0.1
-
-   1118 bash             0.1  0.0
-
-
+    292 mysqld           0.9  4.9
+    129 snapfuse         0.0  0.1
+    437 Relay(438)       0.0  0.0
 
 Top 3 Processes by Memory:
-
     PID COMMAND         %CPU %MEM
-
-    302 mysqld           0.9  4.9
-
-    236 snapd            0.1  0.4
-
-    281 unattended-upgr  0.0  0.2
-
-
-
-========== SYS GUARD MENU ==========
-
-1) Generate System Health Report
-
-2) Show Top 3 CPU/Memory Processes
-
-3) Show Lowest 3 CPU/Memory Processes
-
-4) Send Memory Alert Email (if > 80%)
-
-5) Exit
+    292 mysqld           0.9  4.9
+    225 snapd            0.0  0.4
+    269 unattended-upgr  0.0  0.2
 
 Enter your choice: 3
-
 Lowest 3 Processes by CPU:
-
     PID COMMAND         %CPU %MEM
-
       6 init             0.0  0.0
-
-    130 snapfuse         0.0  0.0
-
-    132 snapfuse         0.0  0.0
-
-
+    112 snapfuse         0.0  0.0
+    113 snapfuse         0.0  0.0
 
 Lowest 3 Processes by Memory:
-
     PID COMMAND         %CPU %MEM
-
-    438 SessionLeader    0.0  0.0
-
-    445 Relay(446)       0.0  0.0
-
-    130 snapfuse         0.0  0.0
-
-
-
-========== SYS GUARD MENU ==========
-
-1) Generate System Health Report
-
-2) Show Top 3 CPU/Memory Processes
-
-3) Show Lowest 3 CPU/Memory Processes
-
-4) Send Memory Alert Email (if > 80%)
-
-5) Exit
+    436 SessionLeader    0.0  0.0
+    437 Relay(438)       0.0  0.0
+    112 snapfuse         0.0  0.0
 
 Enter your choice: 4
 
-
-
-========== SYS GUARD MENU ==========
-
-1) Generate System Health Report
-
-2) Show Top 3 CPU/Memory Processes
-
-3) Show Lowest 3 CPU/Memory Processes
-
-4) Send Memory Alert Email (if > 80%)
-
-5) Exit
-
-
 Enter your choice: 5
+Checking network status...
+Active Interfaces:
+lo 127.0.0.1/8
+eth0 172.19.128.184/20
 
-Exiting...
+Pinging Google (8.8.8.8)...
+6
+Network is UP and Internet reachable.
+
+Enter your choice: 7
+Detailed Disk Usage:
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sdd       1007G  2.7G  954G   1% /
+
+Enter your choice: 8
+System Performance Rating:
+Excellent (Avg Load: 4.2%)
+
+Enter your choice:
+enscript or ps2pdf not found. Install with:
+sudo apt install enscript ghostscript -y
+
+exit...
