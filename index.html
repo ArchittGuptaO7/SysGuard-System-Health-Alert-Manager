@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SysGuard — Linux System Health &amp; Alert Manager</title>
+<meta name="description" content="SysGuard is a lightweight Bash-based Linux monitoring tool that watches CPU, memory, disk, network and uptime, then reports and alerts before things break.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ LOADER ============ -->
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="loader-inner">
+    <span class="loader-prompt"><span class="loader-caret">$</span> ./sysguard.sh <span class="blink">_</span></span>
+  </div>
+</div>
+
+<!-- ============ AMBIENT BACKGROUND ============ -->
+<div class="bg-grid" aria-hidden="true"></div>
+<canvas id="particles" aria-hidden="true"></canvas>
+
+<!-- ============ NAVBAR ============ -->
+<header class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="#top" class="brand">
+      <span class="brand-dot" aria-hidden="true"></span>
+      <span class="brand-text">SysGuard</span>
+    </a>
+
+    <nav class="nav-links" id="navLinks">
+      <a href="#about" class="nav-link">About</a>
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#architecture" class="nav-link">Architecture</a>
+      <a href="#tech" class="nav-link">Stack</a>
+      <a href="#install" class="nav-link">Install</a>
+      <a href="#developer" class="nav-link">Developer</a>
+    </nav>
+
+    <div class="nav-cta">
+      <a href="https://github.com/#" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.49c-2.22.48-2.69-1.07-2.69-1.07-.36-.92-.89-1.16-.89-1.16-.72-.5.06-.49.06-.49.8.06 1.22.82 1.22.82.71 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.14-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.65 7.65 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.55.82 1.27.82 2.14 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        GitHub
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ MOBILE MENU ============ -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" class="mobile-link">About</a>
+  <a href="#features" class="mobile-link">Features</a>
+  <a href="#architecture" class="mobile-link">Architecture</a>
+  <a href="#workflow" class="mobile-link">Workflow</a>
+  <a href="#tech" class="mobile-link">Stack</a>
+  <a href="#screenshots" class="mobile-link">Screenshots</a>
+  <a href="#code" class="mobile-link">Code</a>
+  <a href="#install" class="mobile-link">Install</a>
+  <a href="#roadmap" class="mobile-link">Roadmap</a>
+  <a href="#developer" class="mobile-link">Developer</a>
+</div>
+
+<main id="top">
+
+<!-- ============ 1. HERO ============ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-copy reveal">
+      <span class="eyebrow"><span class="pulse-dot"></span> Unix Lab Project — Live Monitoring</span>
+      <h1 class="hero-title">Sys<span class="accent-text">Guard</span></h1>
+      <p class="hero-subtitle">Linux System Health &amp; Alert Manager</p>
+      <p class="hero-desc">A lightweight Bash-based Linux monitoring system that continuously checks CPU, RAM, disk, network and system health — then colour-codes the verdict, writes the report, and gets out of your way.</p>
+
+      <div class="hero-actions">
+        <a href="https://github.com/#" target="_blank" rel="noopener" class="btn btn-primary ripple">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.49c-2.22.48-2.69-1.07-2.69-1.07-.36-.92-.89-1.16-.89-1.16-.72-.5.06-.49.06-.49.8.06 1.22.82 1.22.82.71 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.14-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.65 7.65 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.55.82 1.27.82 2.14 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          View on GitHub
+        </a>
+        <a href="#install" class="btn btn-outline ripple">
+          Documentation
+        </a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hstat"><span class="hstat-num">9</span><span class="hstat-label">menu functions</span></div>
+        <div class="hstat"><span class="hstat-num">0</span><span class="hstat-label">dependencies*</span></div>
+        <div class="hstat"><span class="hstat-num">100%</span><span class="hstat-label">pure Bash</span></div>
+      </div>
+    </div>
+
+    <div class="hero-visual reveal" aria-hidden="true">
+      <!-- Animated server / terminal illustration -->
+      <svg class="server-svg" viewBox="0 0 420 460" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="rackGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#141a24"/>
+            <stop offset="100%" stop-color="#0c1017"/>
+          </linearGradient>
+          <linearGradient id="glow1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#29d398"/>
+            <stop offset="100%" stop-color="#5b8def"/>
+          </linearGradient>
+        </defs>
+        <ellipse cx="210" cy="430" rx="150" ry="18" fill="#29d398" opacity="0.06"/>
+        <rect x="60" y="40" width="300" height="360" rx="18" fill="url(#rackGrad)" stroke="#22293a" stroke-width="1.5"/>
+        <!-- rack units -->
+        <g id="rackUnits">
+          <rect x="84" y="70" width="252" height="46" rx="8" fill="#12171f" stroke="#232b3a"/>
+          <circle class="unit-led led-a" cx="104" cy="93" r="5" fill="#29d398"/>
+          <rect x="124" y="86" width="140" height="6" rx="3" fill="#232b3a"/>
+          <rect x="124" y="98" width="90" height="6" rx="3" fill="#232b3a"/>
+
+          <rect x="84" y="126" width="252" height="46" rx="8" fill="#12171f" stroke="#232b3a"/>
+          <circle class="unit-led led-b" cx="104" cy="149" r="5" fill="#f2c94c"/>
+          <rect x="124" y="142" width="140" height="6" rx="3" fill="#232b3a"/>
+          <rect x="124" y="154" width="110" height="6" rx="3" fill="#232b3a"/>
+
+          <rect x="84" y="182" width="252" height="46" rx="8" fill="#12171f" stroke="#232b3a"/>
+          <circle class="unit-led led-c" cx="104" cy="205" r="5" fill="#29d398"/>
+          <rect x="124" y="198" width="140" height="6" rx="3" fill="#232b3a"/>
+          <rect x="124" y="210" width="70" height="6" rx="3" fill="#232b3a"/>
+        </g>
+
+        <!-- mini terminal readout -->
+        <rect x="84" y="244" width="252" height="132" rx="10" fill="#080b10" stroke="#232b3a"/>
+        <circle cx="102" cy="262" r="4" fill="#ff5c72"/>
+        <circle cx="116" cy="262" r="4" fill="#f2c94c"/>
+        <circle cx="130" cy="262" r="4" fill="#29d398"/>
+        <text x="100" y="288" font-family="JetBrains Mono, monospace" font-size="11" fill="#29d398">CPU  ▂▃▅▂▇▃▂</text>
+        <text x="100" y="306" font-family="JetBrains Mono, monospace" font-size="11" fill="#5b8def">MEM  ▃▂▂▄▂▃▂</text>
+        <text x="100" y="324" font-family="JetBrains Mono, monospace" font-size="11" fill="#f2c94c">DISK ▁▁▂▁▁▂▁</text>
+        <text x="100" y="346" font-family="JetBrains Mono, monospace" font-size="11" fill="#8b98a5">net: 8.8.8.8 reachable</text>
+        <text x="100" y="362" font-family="JetBrains Mono, monospace" font-size="11" fill="#e6edf3" class="typing-line">status: <tspan fill="#29d398">HEALTHY</tspan></text>
+
+        <!-- floating signal rings -->
+        <circle class="ping-ring" cx="210" cy="20" r="4" fill="none" stroke="url(#glow1)" stroke-width="2"/>
+      </svg>
+    </div>
+  </div>
+  <div class="scroll-cue" aria-hidden="true"><span></span></div>
+</section>
+
+<!-- ============ 2. ABOUT ============ -->
+<section id="about" class="section">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <span class="tag">// about the project</span>
+      <h2>Why SysGuard exists</h2>
+    </div>
+
+    <div class="about-grid">
+      <p class="about-lead reveal">SysGuard started as a Unix Lab project with a simple brief: build something that actually watches a machine, not just prints numbers once and quits. Most beginner monitoring scripts dump raw <code>df</code> and <code>free</code> output and call it done — they don't tell you whether a number is fine or a fire.</p>
+
+      <div class="about-cards">
+        <div class="about-card reveal">
+          <h3>The problem</h3>
+          <p>Servers rarely announce trouble ahead of time. Disks fill quietly, memory leaks creep up over hours, and by the time <code>top</code> gets opened, the damage is already done. SysGuard checks resources continuously and colour-codes severity — green, yellow, red — so a problem is visible the moment it starts, not after a crash.</p>
+        </div>
+        <div class="about-card reveal">
+          <h3>Why Linux monitoring matters</h3>
+          <p>Every production incident retrospective eventually points to a resource that silently ran out. Uptime, memory headroom, and disk space are the boring metrics that predict the exciting outages. Watching them is unglamorous — which is exactly why it's usually the first thing skipped.</p>
+        </div>
+        <div class="about-card reveal">
+          <h3>Educational purpose</h3>
+          <p>Built as a Unix Lab project, SysGuard doubles as a teaching tool for how the OS actually exposes its own vitals — reading <code>/proc/stat</code> for CPU deltas, <code>/proc/meminfo</code> for memory, and <code>df</code>/<code>who</code>/<code>ping</code> for the rest — all without a single third-party binary.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. FEATURES ============ -->
+<section id="features" class="section section-alt">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <span class="tag">// what it watches</span>
+      <h2>Ten things SysGuard keeps an eye on</h2>
+      <p class="section-sub">Every check reads straight from the kernel — no agents, no daemons, no polling services to babysit.</p>
+    </div>
+
+    <div class="feature-grid">
+      <!-- 1 -->
+      <div class="feature-card reveal">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg></div>
+        <h3>CPU Monitoring</h3>
+        <p>Samples <code>/proc/stat</code> twice, one second apart, and computes real load from the delta — not a snapshot guess.</p>
+      </div>
+      <!-- 2 -->
+      <div class="feature-card reveal">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h2M7 13h6"/></svg></div>
+        <h3>Memory Monitoring</h3>
+        <p>Reads <code>MemTotal</code> and <code>MemAvailable</code> from <code>/proc/meminfo</code> and reports used/total in GB with a live percentage.</p>
+      </div>
+      <!-- 3 -->
+      <div class="feature-card reveal">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg></div>
+        <h3>Disk Usage</h3>
+        <p>Pulls root-partition stats via <code>df -P /</code>, then a full breakdown of every mounted device with <code>df -h</code>.</p>
+      </div>
+      <!-- 4 -->
+      <div class="feature-card reveal">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12h4l2-7 4 14 2-7h8"/></svg></div>
+        <h3>Network Status</h3>
+        <p>Lists active interfaces with <code>ip -brief addr</code>, then pings 8.8.8.8 to confirm real internet reachability.</p>
+      </div>
+      <!-- 5 -->
+      <div class="feature-card reveal">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+        <h3>System Uptime</h3>
+        <p>Converts <code>/proc/uptime</code> seconds into a plain-English "X days Y hours Z minutes" readout.</p>
+      </div>
+      <!-- 6 -->
+      <div class="feature-card reveal">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><circle cx="18" cy="9" r="2.4"/><path d="M22 20c0-2.6-1.9-4.7-4.4-5.4"/></svg></div>
+        <h3>Logged-in Users</h3>
+        <p>Counts and lists active sessions with <code>who</code> — useful context whenever a spike coincides with someone logging in.</p>
+      </div>
+      <!-- 7 -->
+      <div class="feature-card reveal">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2 2 21h20L12 2z"/><path d="M12 9v5M12 17h.01"/></svg></div>
+        <h3>Alert Generation</h3>
+        <p>Fires a memory alert automatically once usage crosses an 80% threshold, emailed via standard Unix <code>mail</code>.</p>
+      </div>
+      <!-- 8 -->
+      <div class="feature-card reveal">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h6M9 17h6M9 9h2"/></svg></div>
+        <h3>Log Reports</h3>
+        <p>Every run writes a timestamped <code>.txt</code> report to <code>./reports/</code>, with an optional PDF export via <code>enscript</code> + Ghostscript.</p>
+      </div>
+      <!-- 9 -->
+      <div class="feature-card reveal">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+        <h3>Bash Automation</h3>
+        <p>A single menu-driven script with <code>set -o errexit</code> and <code>pipefail</code> — safe to run unattended or drop into cron.</p>
+      </div>
+      <!-- 10 -->
+      <div class="feature-card reveal">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg></div>
+        <h3>Lightweight Performance</h3>
+        <p>Zero third-party runtimes, zero background daemons — just core coreutils and <code>awk</code>, so the monitor never becomes the load.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. ARCHITECTURE ============ -->
+<section id="architecture" class="section">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <span class="tag">// how data flows</span>
+      <h2>Architecture</h2>
+      <p class="section-sub">One script, six kernel interfaces, zero moving parts to fail.</p>
+    </div>
+
+    <div class="arch-flow reveal">
+      <div class="arch-node">
+        <span class="arch-icon">🐧</span>
+        <span class="arch-label">Linux System</span>
+        <span class="arch-sub">/proc, df, who, ip</span>
+      </div>
+      <div class="arch-arrow"><svg width="24" height="40" viewBox="0 0 24 40"><path d="M12 0v32M4 26l8 10 8-10" stroke="currentColor" stroke-width="2" fill="none"/></svg></div>
+
+      <div class="arch-node">
+        <span class="arch-icon">📜</span>
+        <span class="arch-label">Bash Script</span>
+        <span class="arch-sub">sysguard.sh</span>
+      </div>
+      <div class="arch-arrow"><svg width="24" height="40" viewBox="0 0 24 40"><path d="M12 0v32M4 26l8 10 8-10" stroke="currentColor" stroke-width="2" fill="none"/></svg></div>
+
+      <div class="arch-node">
+        <span class="arch-icon">🩺</span>
+        <span class="arch-label">Health Checks</span>
+        <span class="arch-sub">CPU · MEM · Disk · Net</span>
+      </div>
+      <div class="arch-arrow"><svg width="24" height="40" viewBox="0 0 24 40"><path d="M12 0v32M4 26l8 10 8-10" stroke="currentColor" stroke-width="2" fill="none"/></svg></div>
+
+      <div class="arch-node">
+        <span class="arch-icon">🚨</span>
+        <span class="arch-label">Alert Detection</span>
+        <span class="arch-sub">threshold &gt; 80%</span>
+      </div>
+      <div class="arch-arrow"><svg width="24" height="40" viewBox="0 0 24 40"><path d="M12 0v32M4 26l8 10 8-10" stroke="currentColor" stroke-width="2" fill="none"/></svg></div>
+
+      <div class="arch-node">
+        <span class="arch-icon">🧾</span>
+        <span class="arch-label">Logs &amp; Reports</span>
+        <span class="arch-sub">.txt / .pdf</span>
+      </div>
+      <div class="arch-arrow"><svg width="24" height="40" viewBox="0 0 24 40"><path d="M12 0v32M4 26l8 10 8-10" stroke="currentColor" stroke-width="2" fill="none"/></svg></div>
+
+      <div class="arch-node arch-node-final">
+        <span class="arch-icon">🧑‍💻</span>
+        <span class="arch-label">Administrator</span>
+        <span class="arch-sub">reads &amp; reacts</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. PROJECT WORKFLOW ============ -->
+<section id="workflow" class="section section-alt">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <span class="tag">// per-run sequence</span>
+      <h2>Project Workflow</h2>
+    </div>
+
+    <div class="timeline reveal">
+      <div class="timeline-line" aria-hidden="true"></div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot">1</div>
+        <div class="timeline-content"><h4>Start</h4><p>Menu boots, error handling armed, <code>./reports</code> created if missing.</p></div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot">2</div>
+        <div class="timeline-content"><h4>Collect System Data</h4><p>Reads <code>/proc/stat</code>, <code>/proc/meminfo</code>, <code>/proc/uptime</code>, <code>df</code>, and <code>who</code>.</p></div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot">3</div>
+        <div class="timeline-content"><h4>Analyze Resources</h4><p>Computes CPU delta, memory percentage, and disk utilization from raw samples.</p></div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot">4</div>
+        <div class="timeline-content"><h4>Compare Thresholds</h4><p>Each metric is colour-graded: green under 50%, yellow under 80%, red above.</p></div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot">5</div>
+        <div class="timeline-content"><h4>Generate Alerts</h4><p>Memory over 80% triggers a <code>mail</code>-based alert with hostname and timestamp.</p></div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot">6</div>
+        <div class="timeline-content"><h4>Store Logs</h4><p>Report written to <code>reports/report_YYYYMMDD_HHMMSS.txt</code>, optional PDF export.</p></div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot">7</div>
+        <div class="timeline-content"><h4>Display Results</h4><p>Colour-coded summary printed straight to the terminal for immediate reading.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. TECHNOLOGIES ============ -->
+<section id="tech" class="section">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <span class="tag">// built with</span>
+      <h2>Technologies Used</h2>
+    </div>
+
+    <div class="tech-grid reveal">
+      <div class="tech-chip"><span class="tech-glyph">🐧</span>Linux</div>
+      <div class="tech-chip"><span class="tech-glyph">💻</span>Bash</div>
+      <div class="tech-chip"><span class="tech-glyph">📝</span>Shell Scripting</div>
+      <div class="tech-chip"><span class="tech-glyph">⏱️</span>Cron</div>
+      <div class="tech-chip"><span class="tech-glyph">🔧</span>Git</div>
+      <div class="tech-chip"><span class="tech-glyph">🐙</span>GitHub</div>
+      <div class="tech-chip"><span class="tech-glyph">🧩</span>VS Code</div>
+      <div class="tech-chip"><span class="tech-glyph">📄</span>Markdown</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. SCREENSHOTS ============ -->
+<section id="screenshots" class="section section-alt">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <span class="tag">// see it run</span>
+      <h2>Screenshots</h2>
+      <p class="section-sub">Swap these placeholders for real captures once you've got a terminal handy.</p>
+    </div>
+
+    <div class="shot-grid reveal">
+      <figure class="shot-card">
+        <div class="shot-frame shot-dashboard"><span class="shot-placeholder">Dashboard</span></div>
+        <figcaption>Main menu dashboard</figcaption>
+      </figure>
+      <figure class="shot-card">
+        <div class="shot-frame shot-terminal"><span class="shot-placeholder">Terminal Output</span></div>
+        <figcaption>Live terminal output</figcaption>
+      </figure>
+      <figure class="shot-card">
+        <div class="shot-frame shot-alert"><span class="shot-placeholder">Alert Message</span></div>
+        <figcaption>High-memory alert</figcaption>
+      </figure>
+      <figure class="shot-card">
+        <div class="shot-frame shot-log"><span class="shot-placeholder">Log Report</span></div>
+        <figcaption>Saved log report</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. CODE PREVIEW ============ -->
+<section id="code" class="section">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <span class="tag">// straight from the source</span>
+      <h2>Code Preview</h2>
+    </div>
+
+    <div class="code-window reveal">
+      <div class="code-titlebar">
+        <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        <span class="code-filename">sysguard.sh</span>
+      </div>
+      <pre class="code-body"><code><span class="c-com"># Reads /proc/meminfo and returns used | total | percent</span>
+<span class="c-fn">get_memory_info</span>() {
+  mem_total_kb=$(<span class="c-fn">awk</span> <span class="c-str">'/MemTotal/ {print $2}'</span> /proc/meminfo)
+  mem_avail_kb=$(<span class="c-fn">awk</span> <span class="c-str">'/MemAvailable/ {print $2}'</span> /proc/meminfo)
+  mem_used_kb=$((mem_total_kb - mem_avail_kb))
+  mem_percent=$(<span class="c-fn">awk</span> -v u=<span class="c-str">"$mem_used_kb"</span> -v t=<span class="c-str">"$mem_total_kb"</span> \
+    <span class="c-str">'BEGIN{printf "%.1f", (u/t)*100}'</span>)
+  <span class="c-kw">printf</span> <span class="c-str">"%s|%s|%s\n"</span> <span class="c-var">"$mem_used_gb"</span> <span class="c-var">"$mem_total_gb"</span> <span class="c-var">"$mem_percent"</span>
+}
+
+<span class="c-com"># Colour-grades a percentage: green &lt; 50, yellow &lt; 80, red above</span>
+<span class="c-fn">colorize_usage</span>() {
+  val=$1
+  <span class="c-kw">if</span> (( $(<span class="c-fn">echo</span> <span class="c-str">"$val &lt; 50"</span> | bc -l) )); <span class="c-kw">then</span>
+    <span class="c-fn">echo</span> -e <span class="c-str">"${GREEN}${val}%${NC}"</span>
+  <span class="c-kw">elif</span> (( $(<span class="c-fn">echo</span> <span class="c-str">"$val &lt; 80"</span> | bc -l) )); <span class="c-kw">then</span>
+    <span class="c-fn">echo</span> -e <span class="c-str">"${YELLOW}${val}%${NC}"</span>
+  <span class="c-kw">else</span>
+    <span class="c-fn">echo</span> -e <span class="c-str">"${RED}${val}%${NC}"</span>
+  <span class="c-kw">fi</span>
+}</code></pre>
+      <button class="copy-btn" data-copy-target="code-body-text">Copy</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. INSTALLATION ============ -->
+<section id="install" class="section section-alt">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <span class="tag">// get running in 60 seconds</span>
+      <h2>Installation Guide</h2>
+    </div>
+
+    <div class="terminal-box reveal">
+      <div class="code-titlebar">
+        <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        <span class="code-filename">bash</span>
+      </div>
+      <div class="term-lines">
+        <div class="term-line"><span class="prompt">$</span> git clone https://github.com/your-username/sysguard.git</div>
+        <div class="term-line"><span class="prompt">$</span> cd sysguard</div>
+        <div class="term-line"><span class="prompt">$</span> chmod +x sysguard.sh</div>
+        <div class="term-line"><span class="prompt">$</span> ./sysguard.sh</div>
+        <div class="term-line term-out">========== SYS GUARD MENU ==========</div>
+        <div class="term-line term-out">1) Generate System Health Report</div>
+        <div class="term-line term-out">2) Show Top 3 CPU/Memory Processes</div>
+        <div class="term-line term-out">...</div>
+      </div>
+    </div>
+    <p class="install-note">Optional — for PDF report export, also install <code>enscript</code> and <code>ghostscript</code>: <code>sudo apt install enscript ghostscript -y</code></p>
+  </div>
+</section>
+
+<!-- ============ 10. FUTURE IMPROVEMENTS ============ -->
+<section id="roadmap" class="section">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <span class="tag">// what's next</span>
+      <h2>Future Improvements</h2>
+    </div>
+
+    <div class="roadmap-grid reveal">
+      <div class="roadmap-card"><span class="roadmap-icon">📧</span><h4>Email Alerts</h4><p>Richer HTML alert templates beyond plain-text <code>mail</code> output.</p></div>
+      <div class="roadmap-card"><span class="roadmap-icon">🖥️</span><h4>Web Dashboard</h4><p>A lightweight local dashboard to graph history instead of one-shot reports.</p></div>
+      <div class="roadmap-card"><span class="roadmap-icon">🐳</span><h4>Docker Support</h4><p>Ship SysGuard as a container so it monitors the host from a sandbox.</p></div>
+      <div class="roadmap-card"><span class="roadmap-icon">☁️</span><h4>Cloud Monitoring</h4><p>Extend checks to remote hosts over SSH for small multi-server fleets.</p></div>
+      <div class="roadmap-card"><span class="roadmap-icon">📱</span><h4>SMS Notifications</h4><p>Critical alerts pushed via SMS gateway for out-of-band delivery.</p></div>
+      <div class="roadmap-card"><span class="roadmap-icon">🤖</span><h4>AI-based Prediction</h4><p>Trend historical reports to flag resource exhaustion before it happens.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11. DEVELOPER ============ -->
+<section id="developer" class="section section-alt">
+  <div class="section-inner">
+    <div class="dev-card reveal">
+      <div class="dev-avatar" aria-hidden="true">AG</div>
+      <div class="dev-info">
+        <span class="tag">// built by</span>
+        <h2>Architt Gupta</h2>
+        <p class="dev-role">B.Tech CSE (AI/ML)</p>
+        <p class="dev-blurb">Student developer focused on systems thinking, machine learning, and building practical tools that hold up outside a lab environment.</p>
+        <div class="dev-links">
+          <a href="#" class="btn btn-outline btn-sm ripple">GitHub</a>
+          <a href="#" class="btn btn-outline btn-sm ripple">LinkedIn</a>
+          <a href="#" class="btn btn-outline btn-sm ripple">Portfolio</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ 12. FOOTER ============ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="brand-dot" aria-hidden="true"></span>
+      <span>SysGuard</span>
+    </div>
+    <p class="footer-made">Made with <span class="heart">❤</span> using HTML, CSS &amp; JavaScript</p>
+    <p class="footer-copy">© 2026 SysGuard — Unix Lab Project. MIT Licensed.</p>
+  </div>
+</footer>
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<script src="script.js"></script>
+</body>
+</html>
