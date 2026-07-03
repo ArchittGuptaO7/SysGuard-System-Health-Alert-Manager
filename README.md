@@ -1,7 +1,7 @@
 # 🧾 Unix Lab Project  
 **Roll No:** 241033038  
 **Project Title:** SysGuard — Unix System Health & Performance Monitor  
-**Link** https://archittguptao7.github.io/SysGuard-System-Health-Alert-Manager/
+**Link** [SysGuard](https://archittguptao7.github.io/SysGuard-System-Health-Alert-Manager/)
 
 ---
 
